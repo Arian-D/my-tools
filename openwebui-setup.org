@@ -1,0 +1,48 @@
+#+title: My Openwebui Setup
+#+author: Arian
+#+description: This sets up RAG
+#+startup: fold latexpreview
+#+options: toc:nil num:nil
+
+- Prereq :: Podman, enough storage, and enough cpu power
+
+* Containers
+** Open Webui
+- This is the main openwebui container witht the =:ollama= tag which
+  includes ollama
+#+begin_src bash :results none
+  podman run \
+         --rm \
+         -d \
+         --network llm \
+         --name openwebui \
+         -p 3000:8080 \
+         -v ollama:/root/.ollama \
+         -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:ollama
+#+end_src
+
+** Searx
+#+begin_src bash :results none
+  podman run \
+         --rm \
+         -d \
+         --network llm \
+         --name searxng \
+         -e SEARXNG_HOSTNAME=localhost:8080/ \
+         -p 8888:8080 \
+         -v searx-config:/etc/searxng/ \
+         -v searx-data:/var/cache/searxng/ \
+         docker.io/searxng/searxng:latest
+#+end_src
+
+** Playwright
+#+begin_src bash :results none
+  podman run \
+         --rm \
+         -d \
+         --network llm \
+         --name playwright mcr.microsoft.com/playwright:v1.49.1-noble npx \
+         -y playwright@1.49.1 run-server \
+         --port 3000 \
+         --host 0.0.0.0
+#+end_src
