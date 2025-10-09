@@ -1,4 +1,4 @@
-#!/usr/bin/env -S sh -c 'export name=$(basename "$0" .Dockerfile); podman build -qt $name -f "$0" . && podman run -q --rm -it $name $@'
+#!/usr/bin/env -S sh -c 'export name=$(basename "$0" .Dockerfile); (podman build -qt $name -f "$0" . | head -n -1) && podman run -q --rm -it $name $@'
 
 FROM python:3.12
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
