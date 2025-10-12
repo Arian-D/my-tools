@@ -3,13 +3,22 @@
 #+description: This sets up RAG
 #+startup: fold latexpreview
 #+options: toc:nil num:nil
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
 
-- Prereq :: Podman, enough storage, and enough cpu power
+
+- Prereq :: Podman, Emacs, enough storage, and enough cpu power
 
 * Containers
+These are the 3 containes. I'll have to make a lot of these into
+variables so they could be used by other people, but the gist is
+simple.
 ** Open Webui
-- This is the main openwebui container witht the =:ollama= tag which
+- [[https://docs.openwebui.com/][OUI]] is the main openwebui container witht the =:ollama= tag which
   includes ollama
+- You might wanna run this on the gpu. I only have a cpu on this
+  machine.
+- This can also act as an authentication layer, since ollama doesn't
+  have good api token management.
 #+begin_src bash :results none
   podman run \
          --rm \
@@ -21,7 +30,8 @@
          -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:ollama
 #+end_src
 
-** Searx
+** Searxng
+- Searxy baby doing the link fetching for us.
 #+begin_src bash :results none
   podman run \
          --rm \
@@ -36,13 +46,20 @@
 #+end_src
 
 ** Playwright
+- M$ scraping the rendered pages
 #+begin_src bash :results none
   podman run \
          --rm \
          -d \
+         --pull=newer \
          --network llm \
          --name playwright mcr.microsoft.com/playwright:v1.49.1-noble npx \
          -y playwright@1.49.1 run-server \
          --port 3000 \
          --host 0.0.0.0
+#+end_src
+
+* Launch
+#+begin_src emacs-lisp :results none
+(browse-url "http://localhost:3000")
 #+end_src
