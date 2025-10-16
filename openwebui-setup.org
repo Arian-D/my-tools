@@ -1,12 +1,14 @@
 #+title: My Openwebui Setup
 #+author: Arian
-#+description: This sets up RAG
+#+description: This sets up a poor man's perplexity
 #+startup: fold latexpreview
 #+options: toc:nil num:nil
 #+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
 
 
-- Prereq :: Podman, Emacs, enough storage, and enough cpu power
+- Prereq :: Podman, Emacs, enough storage, and enough cpu power.
+- Usage :: Open up this file in Emacs and run =M-x
+  org-babel-execute-buffer=
 
 * Containers
 These are the 3 containes. I'll have to make a lot of these into
@@ -19,10 +21,11 @@ simple.
   machine.
 - This can also act as an authentication layer, since ollama doesn't
   have good api token management.
-#+begin_src bash :results none
+#+begin_src shell :results none
   podman run \
          --rm \
          -d \
+         --pull=newer \
          --network llm \
          --name openwebui \
          -p 3000:8080 \
@@ -32,10 +35,14 @@ simple.
 
 ** Searxng
 - Searxy baby doing the link fetching for us.
+- The config needs updating and I'm not doing that here. Eventually,
+  some sort of =sed= snippet should be used to ensure =json= is a served
+  format so that OUI can communicate with it.
 #+begin_src bash :results none
   podman run \
          --rm \
-         -d \
+         --detach \
+         --pull=newer \
          --network llm \
          --name searxng \
          -e SEARXNG_HOSTNAME=localhost:8080/ \
@@ -58,6 +65,82 @@ simple.
          --port 3000 \
          --host 0.0.0.0
 #+end_src
+
+
+** MCP
+
+*** mcpo
+#+name: mcpo-config
+#+begin_src json :noeval
+  {
+    "mcpServers": {
+      "deepwiki": {
+        "type": "sse",
+        "url": "https://mcp.deepwiki.com/sse"
+      },
+      "fetch": {
+        "command": "uvx",
+        "args": ["mcp-server-fetch"]
+      },
+      "time": {
+        "command": "uvx",
+        "args": ["mcp-server-time", "--local-timezone=America/New_York"]
+      },
+      "memory": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory"
+        ]
+      }
+    }
+  }
+#+end_src
+
+#+name: mcpo-dockerfile
+#+begin_src dockerfile :noweb yes :noeval
+  FROM ghcr.io/open-webui/mcpo:main
+  RUN cat <<EOT > /config.json
+  <<mcpo-config>>
+  EOT
+  ENTRYPOINT mcpo --port 3000 --config /config.json
+#+end_src
+
+#+begin_src shell :noweb yes :results none
+  podman build -t my-mcpo -f - . <<EOF
+  <<mcpo-dockerfile>>
+  EOF
+#+end_src
+
+#+begin_src shell :results none
+  podman run \
+         --network llm \
+         --publish 8000:3000 \
+         --rm \
+         --name mcpo \
+         --detach \
+         my-mcpo
+#+end_src
+
+*** COMMENT playwright mcp
+#+begin_src shell :results none
+  podman run \
+         --detach \
+         --rm --init --pull=always \
+         --entrypoint node \
+         --name playwright-mcp \
+         --expose 8931 \
+         --network llm \
+         mcr.microsoft.com/playwright/mcp \
+         cli.js --headless \
+         --browser chromium \
+         --no-sandbox \
+         --port 8931 \
+         --host 0.0.0.0 \
+         --allowed-hosts '*'
+#+end_src
+
+
 
 * Launch
 #+begin_src emacs-lisp :results none
