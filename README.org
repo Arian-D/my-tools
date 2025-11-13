@@ -1,0 +1,12 @@
+#+title: My tools
+
+Some personal tools that are public so I can leech off of whatever
+GitHub's offering for free.
+
+* Tools
+** Openwebui
+[[./openwebui-setup.org][This org file]] is a literate file for running a simple Openwebui +
+Ollama setup.
+
+** Amp Container
+[[./amp.Dockerfile][This Dockerfile]] is a simple environment for running [[https://ampcode.com/][amp]].
