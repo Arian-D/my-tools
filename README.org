@@ -9,4 +9,4 @@ GitHub's offering for free.
 Ollama setup.
 
 ** Amp Container
-[[./amp.Dockerfile][This Dockerfile]] is a simple environment for running [[https://ampcode.com/][amp]].
+[[./my-amp-env.Dockerfile][This Dockerfile]] is a simple environment for running [[https://ampcode.com/][amp]].
