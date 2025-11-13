@@ -6,7 +6,13 @@ GitHub's offering for free.
 * Tools
 ** Openwebui
 [[./openwebui-setup.org][This org file]] is a literate file for running a simple Openwebui +
-Ollama setup.
+Ollama setup. I've stopped using this in favor of gptel.
 
 ** Amp Container
-[[./my-amp-env.Dockerfile][This Dockerfile]] is a simple environment for running [[https://ampcode.com/][amp]].
+[[./my-amp-env.Dockerfile][This Dockerfile]] is a self-contained environment for running
+[[https://ampcode.com/][amp]]. You'll need podman, and then run it like this in your project directory.
+#+begin_src shell
+  AMP_API_KEY=... /path/to/my-amp-env.Dockerfile
+#+end_src
+
+The default =$EDITOR= is Helix.
