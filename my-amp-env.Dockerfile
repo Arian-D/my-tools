@@ -1,4 +1,4 @@
-#!/usr/bin/env -S sh -c 'podman build -q -t $(basename "$0" .Dockerfile) -f "$0" . && podman run --rm -v $(pwd):/amp-dir -e TERM -e AMP_API_KEY -it $(basename "$0" .Dockerfile)'
+#!/usr/bin/env -S sh -c 'name=$(basename "$0" .Dockerfile); podman build --pull=missing -q -t $name -f "$0" . && podman run --rm -v $(pwd):/amp-dir -e TERM -e AMP_API_KEY -it $name'
 
 FROM docker.io/node:25
 
