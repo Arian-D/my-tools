@@ -9,6 +9,20 @@ RUN wget --quiet https://github.com/helix-editor/helix/releases/download/25.07.1
 # Feel free to swap this out for an ne🤮vim or other inferior editors
 ENV EDITOR=hx
 
+# TODO: Switch to a USER instead???
+
+RUN mkdir -p ~/.config/amp
+RUN cat > ~/.config/amp/settings.json <<JSON
+{
+  "amp.mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--headless", "--isolated"]
+    }
+  }
+}
+JSON
+
 # Mount this
 WORKDIR /amp-dir
 
